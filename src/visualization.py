@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_results(summary, num_hours_cutoff):
+def create_tlc_analysis_figure(summary, num_hours_cutoff):
     hours_since_post_creation = summary["hours_since_post_creation"]
     scores = summary["scores"]
     nta = summary["nta"]
@@ -11,6 +11,7 @@ def plot_results(summary, num_hours_cutoff):
     info = summary["info"]
     other = summary["other"]
 
+    fig_handle = plt.figure()
     plt.scatter(hours_since_post_creation[np.where(nta)], scores[np.where(nta)], c="tab:green", label="NTA")
     plt.scatter(hours_since_post_creation[np.where(yta)], scores[np.where(yta)], c="tab:orange", label="YTA")
     plt.scatter(hours_since_post_creation[np.where(info)], scores[np.where(info)], c="tab:purple", label="INFO")
@@ -21,4 +22,4 @@ def plot_results(summary, num_hours_cutoff):
     plt.ylabel("Voting score")
     plt.title("Sentiment of top level comments")
     plt.legend()
-    plt.show()
+    return fig_handle
