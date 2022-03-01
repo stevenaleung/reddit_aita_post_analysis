@@ -32,10 +32,14 @@ jobs:
           pip install -r requirements.txt
       
       - name: Run tests with pytest
+        env: 
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          USER_AGENT: ${{ secrets.USER_AGENT }}
         run: |
-          touch test.ini
-          echo '[bot1]' > praw.ini
-          echo 'client_id=${{ secrets.CLIENT_ID }}' > praw.ini
-          echo 'client_secret=${{ secrets.CLIENT_SECRET }}' > praw.ini
-          echo 'user_agent=${{ secrets.USER_AGENT }}' > praw.ini
+          touch praw.ini
+          echo '[bot1]' >> praw.ini
+          echo 'client_id=$CLIENT_ID' >> praw.ini
+          echo 'client_secret=$CLIENT_SECRET' >> praw.ini
+          echo 'user_agent=$USER_AGENT' >> praw.ini
           pytest 
