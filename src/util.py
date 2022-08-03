@@ -102,7 +102,7 @@ def depth_first_write_to_csv(csv_filename, comment_stack):
 
     while comment_stack:
         comment_level, comment = comment_stack.pop()
-        row = [comment_level, get_author_name(comment)]
+        row = create_row(comment, comment_level)
         csv_writer.writerow(row)
         for child_comment in reversed(comment.replies):
             comment_stack.append((comment_level+1, child_comment))
@@ -110,6 +110,12 @@ def depth_first_write_to_csv(csv_filename, comment_stack):
     csv_handle.close()
 
     return None
+
+
+def create_row(comment, comment_level):
+    row = [""] * comment_level
+    row.append(get_author_name(comment))
+    return row
 
 
 def get_author_name(comment):
