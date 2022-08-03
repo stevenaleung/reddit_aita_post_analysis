@@ -1,5 +1,6 @@
 import praw
 import numpy as np
+import csv
 
 
 def analyze_post_tlc(post_id):
@@ -78,3 +79,42 @@ def get_judgement_counts(comment_list):
                         "info": info,
                         "other": other}
     return judgement_counts
+
+
+def save_post_to_csv(post_id, csv_filename):
+    reddit = get_reddit_connection()
+    post = get_post(reddit, post_id)
+    tlc_list = get_top_level_comments(post)
+
+    comment_stack = []
+    comment_level = 0
+    for tlc in reversed(tlc_list):
+        comment_stack.append((comment_level, tlc))
+
+    depth_first_write_to_csv(csv_filename, comment_stack)
+
+    return None
+
+
+def depth_first_write_to_csv(csv_filename, comment_stack):
+    csv_handle = open(csv_filename, "w")
+    csv_writer = csv.writer(csv_handle)
+
+    while comment_stack:
+        comment_level, comment = comment_stack.pop()
+        row = [comment_level, get_author_name(comment)]
+        csv_writer.writerow(row)
+        for child_comment in reversed(comment.replies):
+            comment_stack.append((comment_level+1, child_comment))
+
+    csv_handle.close()
+
+    return None
+
+
+def get_author_name(comment):
+    if comment.author is None:
+        author_name = "[deleted]"
+    else:
+        author_name = comment.author.name
+    return author_name
