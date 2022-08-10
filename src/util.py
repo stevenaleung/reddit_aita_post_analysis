@@ -88,7 +88,7 @@ def save_post_to_csv(post_id, csv_filename):
 
     comment_stack = []
     comment_level = 0
-    for tlc_idx, tlc in enumerate(reversed(tlc_list)):
+    for tlc_idx, tlc in reversed(list(enumerate(tlc_list))):
         comment_stack.append((comment_level, tlc_idx, tlc))
 
     depth_first_write_to_csv(csv_filename, comment_stack)
