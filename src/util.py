@@ -139,7 +139,7 @@ def get_hierarchy_code(hierarchy_stack):
 
 
 def create_row(comment, comment_level, hierarchy_code):
-    row = [hierarchy_code, comment.id, comment.permalink, get_author_name(comment)]
+    row = [hierarchy_code, comment.id, get_author_name(comment)]
     row.extend([""] * comment_level)
     row.append(comment.body)
     return row
