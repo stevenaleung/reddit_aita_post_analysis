@@ -88,8 +88,8 @@ def save_post_to_csv(post_id, csv_filename):
 
     comment_stack = []
     comment_level = 0
-    for tlc in reversed(tlc_list):
-        comment_stack.append((comment_level, tlc))
+    for tlc_idx, tlc in enumerate(reversed(tlc_list)):
+        comment_stack.append((comment_level, tlc_idx, tlc))
 
     depth_first_write_to_csv(csv_filename, comment_stack)
 
@@ -101,11 +101,11 @@ def depth_first_write_to_csv(csv_filename, comment_stack):
     csv_writer = csv.writer(csv_handle)
 
     while comment_stack:
-        comment_level, comment = comment_stack.pop()
+        comment_level, comment_idx, comment = comment_stack.pop()
         row = create_row(comment, comment_level)
         csv_writer.writerow(row)
-        for child_comment in reversed(comment.replies):
-            comment_stack.append((comment_level+1, child_comment))
+        for child_idx, child_comment in enumerate(reversed(comment.replies)):
+            comment_stack.append((comment_level+1, child_idx, child_comment))
 
     csv_handle.close()
 
