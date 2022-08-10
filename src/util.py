@@ -113,7 +113,7 @@ def depth_first_write_to_csv(csv_filename, comment_stack):
 
 
 def create_row(comment, comment_level):
-    row = [get_author_name(comment)]
+    row = [comment.id, comment.permalink, get_author_name(comment)]
     row.extend([""] * comment_level)
     row.append(comment.body)
     return row
