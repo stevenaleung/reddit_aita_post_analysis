@@ -100,20 +100,46 @@ def depth_first_write_to_csv(csv_filename, comment_stack):
     csv_handle = open(csv_filename, "w")
     csv_writer = csv.writer(csv_handle)
 
+    prev_comment_level = 0
+    hierarchy_stack = [prev_comment_level]
+
     while comment_stack:
         comment_level, comment_idx, comment = comment_stack.pop()
-        row = create_row(comment, comment_level)
+        update_hierarchy_stack(hierarchy_stack, comment_level, prev_comment_level, comment_idx)
+        hierarchy_code = get_hierarchy_code(hierarchy_stack)
+        row = create_row(comment, comment_level, hierarchy_code)
         csv_writer.writerow(row)
-        for child_idx, child_comment in enumerate(reversed(comment.replies)):
+        for child_idx, child_comment in reversed(list(enumerate(comment.replies))):
             comment_stack.append((comment_level+1, child_idx, child_comment))
+        prev_comment_level = comment_level
 
     csv_handle.close()
 
     return None
 
 
-def create_row(comment, comment_level):
-    row = [comment.id, comment.permalink, get_author_name(comment)]
+def update_hierarchy_stack(hierarchy_stack, comment_level, prev_comment_level, comment_idx):
+    if comment_level > prev_comment_level:
+        hierarchy_stack.append(comment_idx)
+    elif comment_level == prev_comment_level:
+        hierarchy_stack.pop()
+        hierarchy_stack.append(comment_idx)
+    elif comment_level < prev_comment_level:
+        while comment_level < prev_comment_level:
+            hierarchy_stack.pop()
+            prev_comment_level = len(hierarchy_stack) - 1
+        hierarchy_stack.pop()
+        hierarchy_stack.append(comment_idx)
+    return None
+
+
+def get_hierarchy_code(hierarchy_stack):
+    hierarchy_code = ".".join(map(str, hierarchy_stack))
+    return hierarchy_code
+
+
+def create_row(comment, comment_level, hierarchy_code):
+    row = [hierarchy_code, comment.id, comment.permalink, get_author_name(comment)]
     row.extend([""] * comment_level)
     row.append(comment.body)
     return row
