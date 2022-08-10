@@ -99,6 +99,8 @@ def save_post_to_csv(post_id, csv_filename):
 def depth_first_write_to_csv(csv_filename, comment_stack):
     csv_handle = open(csv_filename, "w")
     csv_writer = csv.writer(csv_handle)
+    header = ["hierarchy_code", "id", "score", "author", "comments"]
+    csv_writer.writerow(header)
 
     prev_comment_level = 0
     hierarchy_stack = [prev_comment_level]
