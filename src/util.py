@@ -1,5 +1,6 @@
 import praw
 import numpy as np
+import csv
 
 
 def analyze_post_tlc(post_id):
@@ -78,3 +79,77 @@ def get_judgement_counts(comment_list):
                         "info": info,
                         "other": other}
     return judgement_counts
+
+
+def save_post_to_csv(post_id, csv_filename):
+    reddit = get_reddit_connection()
+    post = get_post(reddit, post_id)
+    tlc_list = get_top_level_comments(post)
+
+    comment_stack = []
+    comment_level = 0
+    for tlc_idx, tlc in reversed(list(enumerate(tlc_list))):
+        comment_stack.append((comment_level, tlc_idx, tlc))
+
+    depth_first_write_to_csv(csv_filename, comment_stack)
+
+    return None
+
+
+def depth_first_write_to_csv(csv_filename, comment_stack):
+    csv_handle = open(csv_filename, "w")
+    csv_writer = csv.writer(csv_handle)
+    header = ["hierarchy_code", "id", "score", "author", "comments"]
+    csv_writer.writerow(header)
+
+    prev_comment_level = 0
+    hierarchy_stack = [prev_comment_level]
+
+    while comment_stack:
+        comment_level, comment_idx, comment = comment_stack.pop()
+        update_hierarchy_stack(hierarchy_stack, comment_level, prev_comment_level, comment_idx)
+        hierarchy_code = get_hierarchy_code(hierarchy_stack)
+        row = create_row(comment, comment_level, hierarchy_code)
+        csv_writer.writerow(row)
+        for child_idx, child_comment in reversed(list(enumerate(comment.replies))):
+            comment_stack.append((comment_level+1, child_idx, child_comment))
+        prev_comment_level = comment_level
+
+    csv_handle.close()
+
+    return None
+
+
+def update_hierarchy_stack(hierarchy_stack, comment_level, prev_comment_level, comment_idx):
+    if comment_level > prev_comment_level:
+        hierarchy_stack.append(comment_idx)
+    elif comment_level == prev_comment_level:
+        hierarchy_stack.pop()
+        hierarchy_stack.append(comment_idx)
+    elif comment_level < prev_comment_level:
+        while comment_level < prev_comment_level:
+            hierarchy_stack.pop()
+            prev_comment_level = len(hierarchy_stack) - 1
+        hierarchy_stack.pop()
+        hierarchy_stack.append(comment_idx)
+    return None
+
+
+def get_hierarchy_code(hierarchy_stack):
+    hierarchy_code = ".".join(map(str, hierarchy_stack))
+    return hierarchy_code
+
+
+def create_row(comment, comment_level, hierarchy_code):
+    row = [hierarchy_code, comment.id, comment.score, get_author_name(comment)]
+    row.extend([""] * comment_level)
+    row.append(comment.body)
+    return row
+
+
+def get_author_name(comment):
+    if comment.author is None:
+        author_name = "[deleted]"
+    else:
+        author_name = comment.author.name
+    return author_name
