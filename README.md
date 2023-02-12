@@ -11,6 +11,7 @@ A package to analyze posts from reddit.com/r/AmItheAsshole/
 ```python
 import src.util as util
 import src.visualization as vis
+import matplotlib.pyplot as plt
 
 post_id = "123456"
 
