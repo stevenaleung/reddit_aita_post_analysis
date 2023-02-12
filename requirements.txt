@@ -1,6 +1,7 @@
 attrs==21.4.0
 certifi==2021.10.8
 charset-normalizer==2.0.10
+coverage==7.1.0
 cycler==0.11.0
 fonttools==4.28.5
 idna==3.3
@@ -16,10 +17,12 @@ prawcore==2.3.0
 py==1.11.0
 pyparsing==3.0.7
 pytest==6.2.5
+pytest-cov==4.0.0
 python-dateutil==2.8.2
 requests==2.27.1
 six==1.16.0
 toml==0.10.2
+tomli==2.0.1
 update-checker==0.18.0
 urllib3==1.26.8
 websocket-client==1.2.3

@@ -1,5 +1,9 @@
 # reddit_aita_post_analysis
 
+[![Build Status](https://github.com/stevenaleung/reddit_aita_post_analysis/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/stevenaleung/reddit_aita_post_analysis/actions/workflows/CI.yml?query=branch%3Amain)
+[![codecov](https://codecov.io/gh/stevenaleung/reddit_aita_post_analysis/branch/main/graph/badge.svg?token=36E0JH5GYV)](https://codecov.io/gh/stevenaleung/reddit_aita_post_analysis)
+
+
 A package to analyze posts from reddit.com/r/AmItheAsshole/
 
 ## Quick start
