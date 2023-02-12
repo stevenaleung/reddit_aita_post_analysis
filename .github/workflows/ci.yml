@@ -42,4 +42,7 @@ jobs:
           echo 'client_id=$CLIENT_ID' >> praw.ini
           echo 'client_secret=$CLIENT_SECRET' >> praw.ini
           echo 'user_agent=$USER_AGENT' >> praw.ini
-          pytest 
+          pytest
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
