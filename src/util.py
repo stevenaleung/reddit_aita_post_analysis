@@ -3,19 +3,25 @@ import numpy as np
 import csv
 
 
-def analyze_post_tlc(post_id):
+def get_reddit_connection():
+    return praw.Reddit("bot1", user_agent="N/A")
+
+
+def get_post(reddit, post_id):
+    return reddit.submission(id=post_id)
+
+
+def analyze_post_tlc(post):
     # get the list of top level comments
-    reddit = get_reddit_connection()
-    post = get_post(reddit, post_id)
     tlc_list = get_top_level_comments(post)
 
-    # comment creation times
+    # calculate comment creation times
     post_creation_time = get_post_creation_time(post)
     tlc_creation_times = get_comment_creation_time(tlc_list)
     tlc_seconds_since_post_creation = tlc_creation_times - post_creation_time
     tlc_hours_since_post_creation = convert_seconds_to_hours(tlc_seconds_since_post_creation)
     
-    # voting score
+    # get voting scores
     tlc_scores = get_comment_scores(tlc_list)
 
     # combine all data
@@ -23,14 +29,6 @@ def analyze_post_tlc(post_id):
     summary["hours_since_post_creation"] = tlc_hours_since_post_creation
     summary["scores"] = tlc_scores
     return summary
-
-
-def get_reddit_connection():
-    return praw.Reddit("bot1", user_agent="N/A")
-
-
-def get_post(reddit, post_id):
-    return reddit.submission(id=post_id)
 
 
 def get_top_level_comments(post):
