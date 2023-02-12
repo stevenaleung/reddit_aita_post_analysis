@@ -1,4 +1,4 @@
-name: run tests with PyTest
+name: CI
 on:
   - push
   - pull_request
