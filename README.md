@@ -9,6 +9,9 @@ A package to analyze posts from reddit.com/r/AmItheAsshole/
 ## Quick start
 
 ```python
+%load_ext autoreload
+%autoreload 2
+
 import src.util as util
 import src.visualization as vis
 import matplotlib.pyplot as plt
