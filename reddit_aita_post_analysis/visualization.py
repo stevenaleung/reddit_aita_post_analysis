@@ -12,11 +12,31 @@ def create_tlc_analysis_figure(summary, num_hours_cutoff):
     other = summary["other"]
 
     fig_handle = plt.figure()
-    plt.scatter(hours_since_post_creation[np.where(nta)], scores[np.where(nta)], c="tab:green", label="NTA")
-    plt.scatter(hours_since_post_creation[np.where(yta)], scores[np.where(yta)], c="tab:orange", label="YTA")
-    plt.scatter(hours_since_post_creation[np.where(info)], scores[np.where(info)], c="tab:purple", label="INFO")
-    plt.scatter(hours_since_post_creation[np.where(other)], scores[np.where(other)], c="tab:blue", label="Other")
-    plt.xlim((0,num_hours_cutoff))
+    plt.scatter(
+        hours_since_post_creation[np.where(nta)],
+        scores[np.where(nta)],
+        c="tab:green",
+        label="NTA",
+    )
+    plt.scatter(
+        hours_since_post_creation[np.where(yta)],
+        scores[np.where(yta)],
+        c="tab:orange",
+        label="YTA",
+    )
+    plt.scatter(
+        hours_since_post_creation[np.where(info)],
+        scores[np.where(info)],
+        c="tab:purple",
+        label="INFO",
+    )
+    plt.scatter(
+        hours_since_post_creation[np.where(other)],
+        scores[np.where(other)],
+        c="tab:blue",
+        label="Other",
+    )
+    plt.xlim((0, num_hours_cutoff))
     plt.grid("on")
     plt.xlabel("Time since original post (hr)")
     plt.ylabel("Voting score")
@@ -38,15 +58,15 @@ def create_tlc_ranking_figure(summary, num_comments):
     other_idxs = np.where(other)[0]
 
     fig_handle = plt.figure()
-    plt.scatter(nta_idxs+1, scores[nta_idxs], c="tab:green", label="NTA")
-    plt.scatter(yta_idxs+1, scores[yta_idxs], c="tab:orange", label="YTA")
-    plt.scatter(info_idxs+1, scores[info_idxs], c="tab:purple", label="INFO")
-    plt.scatter(other_idxs+1, scores[other_idxs], c="tab:blue", label="Other")
-    plt.xlim((0,num_comments))
+    plt.scatter(nta_idxs + 1, scores[nta_idxs], c="tab:green", label="NTA")
+    plt.scatter(yta_idxs + 1, scores[yta_idxs], c="tab:orange", label="YTA")
+    plt.scatter(info_idxs + 1, scores[info_idxs], c="tab:purple", label="INFO")
+    plt.scatter(other_idxs + 1, scores[other_idxs], c="tab:blue", label="Other")
+    plt.xlim((0, num_comments))
     plt.grid("on")
     plt.xlabel("Comments ranked by 'best'")
     plt.ylabel("Voting score")
     plt.title("Sentiment of 'best' ranked top level comments")
     plt.legend()
-    plt.xticks(range(1,num_comments,2))
+    plt.xticks(range(1, num_comments, 2))
     return fig_handle
