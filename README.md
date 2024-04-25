@@ -12,8 +12,8 @@ A package to analyze posts from reddit.com/r/AmItheAsshole/
 %load_ext autoreload
 %autoreload 2
 
-import src.util as util
-import src.visualization as vis
+import reddit_aita_post_analysis.util as util
+import reddit_aita_post_analysis.visualization as vis
 import matplotlib.pyplot as plt
 
 post_id = "123456"

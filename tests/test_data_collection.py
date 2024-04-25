@@ -1,5 +1,5 @@
 import praw
-import src.util as util
+import reddit_aita_post_analysis.util as util
 
 
 def test_connection():
