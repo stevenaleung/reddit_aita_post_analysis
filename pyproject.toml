@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "reddit_aita_post_analysis"
+version = "0.1.0"
+description = ""
+authors = ["Steve Leung <4917419+stevenaleung@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{include = "reddit_aita_post_analysis"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+ipython = "8.14"
+matplotlib = "^3.8.4"
+numpy = "^1.26.4"
+praw = "^7.7.1"
+pytest = "^8.1.1"
+
+[tool.poetry.group.ci]
+optional = true
+
+[tool.poetry.group.ci.dependencies]
+pytest-cov = "^5.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

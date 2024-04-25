@@ -1,7 +1,6 @@
-env/
+.venv/
 *.pyc
 **.DS_Store
-*.py
 *.csv
 
 praw.ini

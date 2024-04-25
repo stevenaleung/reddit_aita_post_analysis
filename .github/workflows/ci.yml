@@ -1,17 +1,19 @@
 name: CI
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - "main"
+  pull_request:
 
 jobs:
   test:
-    name: Python ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
+    name: Python ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         version:
-          - 3.9.7
+          - 3.9
         os:
           - ubuntu-20.04
         arch:
@@ -19,19 +21,31 @@ jobs:
     
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.version }}
       
-      - name: Install dependencies
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2
+
+      - name: Setup a local virtual environment
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      
-      - name: Run tests with pytest
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+
+      - uses: actions/cache@v3
+        name: Define a cache for the virtual environment based on the dependencies lock file
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}
+
+      - name: Install the project dependencies
+        run: poetry install --with ci
+
+      - name: Run the automated tests and generate the coverage report
         env: 
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
@@ -42,7 +56,7 @@ jobs:
           echo 'client_id=$CLIENT_ID' >> praw.ini
           echo 'client_secret=$CLIENT_SECRET' >> praw.ini
           echo 'user_agent=$USER_AGENT' >> praw.ini
-          pytest --cov=src/
+          poetry run pytest tests --cov-config=.coveragerc --cov=./ --cov-report=xml
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
