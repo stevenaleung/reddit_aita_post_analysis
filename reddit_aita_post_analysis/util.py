@@ -19,8 +19,10 @@ def analyze_post_tlc(post):
     post_creation_time = get_post_creation_time(post)
     tlc_creation_times = get_comment_creation_time(tlc_list)
     tlc_seconds_since_post_creation = tlc_creation_times - post_creation_time
-    tlc_hours_since_post_creation = convert_seconds_to_hours(tlc_seconds_since_post_creation)
-    
+    tlc_hours_since_post_creation = convert_seconds_to_hours(
+        tlc_seconds_since_post_creation
+    )
+
     # get voting scores
     tlc_scores = get_comment_scores(tlc_list)
 
@@ -72,10 +74,7 @@ def get_judgement_counts(comment_list):
         yta[idx] = tlc.body.find("YTA") >= 0
         info[idx] = tlc.body.find("INFO") >= 0
     other = np.invert(yta) & np.invert(nta) & np.invert(info)
-    judgement_counts = {"nta": nta,
-                        "yta": yta,
-                        "info": info,
-                        "other": other}
+    judgement_counts = {"nta": nta, "yta": yta, "info": info, "other": other}
     return judgement_counts
 
 
@@ -105,12 +104,14 @@ def depth_first_write_to_csv(csv_filename, comment_stack):
 
     while comment_stack:
         comment_level, comment_idx, comment = comment_stack.pop()
-        update_hierarchy_stack(hierarchy_stack, comment_level, prev_comment_level, comment_idx)
+        update_hierarchy_stack(
+            hierarchy_stack, comment_level, prev_comment_level, comment_idx
+        )
         hierarchy_code = get_hierarchy_code(hierarchy_stack)
         row = create_row(comment, comment_level, hierarchy_code)
         csv_writer.writerow(row)
         for child_idx, child_comment in reversed(list(enumerate(comment.replies))):
-            comment_stack.append((comment_level+1, child_idx, child_comment))
+            comment_stack.append((comment_level + 1, child_idx, child_comment))
         prev_comment_level = comment_level
 
     csv_handle.close()
@@ -118,7 +119,9 @@ def depth_first_write_to_csv(csv_filename, comment_stack):
     return None
 
 
-def update_hierarchy_stack(hierarchy_stack, comment_level, prev_comment_level, comment_idx):
+def update_hierarchy_stack(
+    hierarchy_stack, comment_level, prev_comment_level, comment_idx
+):
     if comment_level > prev_comment_level:
         hierarchy_stack.append(comment_idx)
     elif comment_level == prev_comment_level:
