@@ -1,3 +1,4 @@
+import pandas as pd
 import praw
 import numpy as np
 import csv
@@ -9,6 +10,53 @@ def get_reddit_connection():
 
 def get_post(reddit, post_id):
     return reddit.submission(id=post_id)
+
+
+def to_dataframe(post: praw.models.Submission) -> pd.DataFrame:
+    comment_data = []
+    for tlc_idx, top_level_comment in enumerate(post.comments):
+        comment_stack = []
+        comment_depth = 0
+        comment_stack.append((comment_depth, tlc_idx, top_level_comment))
+
+        prev_comment_depth = 0
+        hierarchy_stack = [prev_comment_depth]
+
+        while comment_stack:
+            comment_depth, comment_idx, comment = comment_stack.pop()
+            update_hierarchy_stack(
+                hierarchy_stack, comment_depth, prev_comment_depth, comment_idx
+            )
+            hierarchy_code = get_hierarchy_code(hierarchy_stack)
+            row = [
+                tlc_idx,
+                hierarchy_code,
+                comment_depth,
+                comment.id,
+                comment.score,
+                get_author_name(comment),
+                comment.body,
+            ]
+            comment_data.append(row)
+
+            for child_idx, child_comment in reversed(list(enumerate(comment.replies))):
+                comment_stack.append((comment_depth + 1, child_idx, child_comment))
+            prev_comment_depth = comment_depth
+
+    # it's much more efficient to first append data to a list then create a dataframe
+    # from the list of lists than it is to append data to an existing dataframe
+    return pd.DataFrame(
+        comment_data,
+        columns=[
+            "tlc_idx",
+            "hierarchy_code",
+            "comment_depth",
+            "comment_id",
+            "comment_score",
+            "author_name",
+            "comment_body",
+        ],
+    )
 
 
 def analyze_post_tlc(post):
