@@ -1,6 +1,7 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 
 def create_tlc_analysis_figure(summary, num_hours_cutoff):
@@ -69,4 +70,24 @@ def create_tlc_ranking_figure(summary, num_comments):
     plt.title("Sentiment of 'best' ranked top level comments")
     plt.legend()
     plt.xticks(range(1, num_comments, 2))
+    return fig_handle
+
+
+def create_total_score_figure(post_df: pd.DataFrame, tlc_idx: int) -> mpl.figure.Figure:
+    """Create a bar chart that tallies the score of every comment in the comment tree"""
+    df_grouped = post_df.groupby(["tlc_idx", "judgement"]).sum()
+    comment_scores_summed = df_grouped.loc[tlc_idx]["comment_score"]
+
+    # when performing a groupby, the values in the pandas series index are not sorted.
+    # they are ordered is by first occurrence instead. we'd like to assign certain
+    # colors to certain judgements, so we need the order to be consistent
+    judgement_scores = {"NTA": 0, "YTA": 0, "UNCLEAR": 0, "INFO": 0}
+    for judgement in comment_scores_summed.index:
+        judgement_scores[judgement] = comment_scores_summed.loc[judgement]
+
+    bar_colors = ["tab:green", "tab:orange", "tab:blue", "tab:purple"]
+
+    fig_handle = plt.figure()
+    plt.bar(judgement_scores.keys(), judgement_scores.values(), color=bar_colors)
+    plt.ylabel("Voting score")
     return fig_handle
