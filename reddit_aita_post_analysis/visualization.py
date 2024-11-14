@@ -4,39 +4,30 @@ import numpy as np
 import pandas as pd
 
 
-def create_tlc_analysis_figure(summary, num_hours_cutoff):
-    hours_since_post_creation = summary["hours_since_post_creation"]
-    scores = summary["scores"]
-    nta = summary["nta"]
-    yta = summary["yta"]
-    info = summary["info"]
-    other = summary["other"]
+def create_top_level_score_vs_time_figure(
+    post_df: pd.DataFrame, num_hours_cutoff: float
+) -> mpl.figure.Figure:
+    is_within_time_cutoff = post_df["hours_since_post_creation"] < num_hours_cutoff
+    is_top_level_comment = post_df["comment_depth"] == 0
+    subset_df = post_df.loc[is_within_time_cutoff & is_top_level_comment]
+
+    color_dict = {
+        "NTA": "tab:green",
+        "YTA": "tab:orange",
+        "UNCLEAR": "tab:blue",
+        "INFO": "tab:purple",
+    }
 
     fig_handle = plt.figure()
-    plt.scatter(
-        hours_since_post_creation[np.where(nta)],
-        scores[np.where(nta)],
-        c="tab:green",
-        label="NTA",
-    )
-    plt.scatter(
-        hours_since_post_creation[np.where(yta)],
-        scores[np.where(yta)],
-        c="tab:orange",
-        label="YTA",
-    )
-    plt.scatter(
-        hours_since_post_creation[np.where(info)],
-        scores[np.where(info)],
-        c="tab:purple",
-        label="INFO",
-    )
-    plt.scatter(
-        hours_since_post_creation[np.where(other)],
-        scores[np.where(other)],
-        c="tab:blue",
-        label="Other",
-    )
+    for judgement, color in color_dict.items():
+        ax_df = subset_df[subset_df["judgement"] == judgement]
+        plt.scatter(
+            ax_df["hours_since_post_creation"],
+            ax_df["comment_score"],
+            c=color,
+            label=judgement,
+        )
+
     plt.xlim((0, num_hours_cutoff))
     plt.grid("on")
     plt.xlabel("Time since original post (hr)")

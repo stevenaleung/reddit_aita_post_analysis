@@ -23,6 +23,9 @@ def to_dataframe(post: praw.models.Submission) -> pd.DataFrame:
             comment_depth, parent_id, comment_idx, comment = comment_stack.pop()
             hierarchy_id = get_hierarchy_id(parent_id, comment_idx)
             judgement = get_judgement(comment)
+            hours_since_post_creation = convert_seconds_to_hours(
+                comment.created_utc - post.created_utc
+            )
             row = [
                 tlc_idx,
                 hierarchy_id,
@@ -30,6 +33,7 @@ def to_dataframe(post: praw.models.Submission) -> pd.DataFrame:
                 judgement,
                 comment.id,
                 comment.score,
+                hours_since_post_creation,
                 get_author_name(comment),
                 comment.body,
             ]
@@ -51,6 +55,7 @@ def to_dataframe(post: praw.models.Submission) -> pd.DataFrame:
             "judgement",
             "comment_id",
             "comment_score",
+            "hours_since_post_creation",
             "author_name",
             "comment_body",
         ],
