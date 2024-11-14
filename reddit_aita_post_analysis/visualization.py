@@ -73,10 +73,12 @@ def create_tlc_ranking_figure(summary, num_comments):
     return fig_handle
 
 
-def create_total_score_figure(post_df: pd.DataFrame, num_tlc: int) -> mpl.figure.Figure:
+def create_total_score_figure(comments_df: pd.DataFrame) -> mpl.figure.Figure:
     """Create a number of bar charts that tally the score of every comment in the
     comment tree. The user can specify the number of comments to analyze"""
-    df_grouped = post_df.groupby(["tlc_idx", "judgement"]).sum()
+    grouped_df = comments_df.groupby(["tlc_idx", "judgement"]).sum()
+    tlc_idxs = pd.unique(grouped_df.index.get_level_values(0))
+    num_tlc = len(tlc_idxs)
 
     fig_handle = plt.figure()
     # adjust the layout of the figure depending on the number of top level comments
@@ -84,9 +86,9 @@ def create_total_score_figure(post_df: pd.DataFrame, num_tlc: int) -> mpl.figure
     num_cols = int(np.ceil(np.sqrt(num_tlc)))
     num_rows = int(np.ceil(num_tlc / num_cols))
 
-    for tlc_idx in range(num_tlc):
-        comment_scores_summed = df_grouped.loc[tlc_idx]["comment_score"]
-        plt.subplot(num_rows, num_cols, tlc_idx + 1)
+    for idx, tlc_idx in enumerate(tlc_idxs):
+        comment_scores_summed = grouped_df.loc[tlc_idx]["comment_score"]
+        plt.subplot(num_rows, num_cols, idx + 1)
         create_total_score_plot(comment_scores_summed)
 
     fig_handle.autofmt_xdate()
@@ -108,14 +110,14 @@ def create_total_score_plot(comment_scores_summed: pd.Series) -> None:
     plt.ylabel("Voting score")
 
 
-def create_score_per_depth_figure(
-    post_df: pd.DataFrame, num_tlc: int
-) -> mpl.figure.Figure:
+def create_score_per_depth_figure(comments_df: pd.DataFrame) -> mpl.figure.Figure:
     """
     Create a number of score per depth figures. The user can specify the number of
     comments to analyze
     """
-    df_grouped = post_df.groupby(["tlc_idx", "comment_depth", "judgement"]).sum()
+    grouped_df = comments_df.groupby(["tlc_idx", "comment_depth", "judgement"]).sum()
+    tlc_idxs = pd.unique(grouped_df.index.get_level_values(0))
+    num_tlc = len(tlc_idxs)
 
     fig_handle = plt.figure()
     # adjust the layout of the figure depending on the number of top level comments
@@ -123,9 +125,9 @@ def create_score_per_depth_figure(
     num_cols = int(np.ceil(np.sqrt(num_tlc)))
     num_rows = int(np.ceil(num_tlc / num_cols))
 
-    for tlc_idx in range(num_tlc):
-        comment_scores_summed = df_grouped.loc[tlc_idx]["comment_score"]
-        ax_handle = plt.subplot(num_rows, num_cols, tlc_idx + 1)
+    for idx, tlc_idx in enumerate(tlc_idxs):
+        comment_scores_summed = grouped_df.loc[tlc_idx]["comment_score"]
+        ax_handle = plt.subplot(num_rows, num_cols, idx + 1)
         create_score_per_depth_plot(comment_scores_summed, ax_handle)
 
     plt.tight_layout()
