@@ -106,3 +106,40 @@ def create_total_score_plot(comment_scores_summed: pd.Series) -> None:
 
     plt.bar(judgement_scores.keys(), judgement_scores.values(), color=bar_colors)
     plt.ylabel("Voting score")
+
+
+def create_score_per_depth_figure(
+    post_df: pd.DataFrame, num_tlc: int
+) -> mpl.figure.Figure:
+    """
+    Create a series of bar charts that tally the judgement scores at each comment depth
+    """
+    df_grouped = post_df.groupby(["tlc_idx", "comment_depth", "judgement"]).sum()
+    comment_scores_summed = df_grouped.loc[tlc_idx]["comment_score"]
+
+    pivoted_df = (
+        comment_scores_summed.reset_index()
+        .groupby(["comment_depth", "judgement"])["comment_score"]
+        .aggregate("first")
+        .unstack()
+    )
+
+    bar_colors = {
+        "NTA": "tab:green",
+        "YTA": "tab:orange",
+        "UNCLEAR": "tab:blue",
+        "INFO": "tab:purple",
+    }
+
+    missing_cols = set(bar_colors.keys()).difference(set(pivoted_df.columns))
+    pivoted_df[list(missing_cols)] = np.NaN
+    pivoted_df = pivoted_df[bar_colors.keys()]
+
+    fig_handle = plt.figure()
+    ax_handle = plt.subplot()
+    pivoted_df.plot.barh(color=bar_colors.values(), ax=ax_handle)
+    plt.gca().invert_yaxis()
+    plt.ylabel("Comment depth")
+    plt.legend(title="")
+
+    return fig_handle
