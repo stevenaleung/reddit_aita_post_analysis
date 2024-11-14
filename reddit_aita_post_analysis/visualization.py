@@ -112,11 +112,30 @@ def create_score_per_depth_figure(
     post_df: pd.DataFrame, num_tlc: int
 ) -> mpl.figure.Figure:
     """
-    Create a series of bar charts that tally the judgement scores at each comment depth
+    Create a number of score per depth figures. The user can specify the number of
+    comments to analyze
     """
     df_grouped = post_df.groupby(["tlc_idx", "comment_depth", "judgement"]).sum()
-    comment_scores_summed = df_grouped.loc[tlc_idx]["comment_score"]
 
+    fig_handle = plt.figure()
+    # adjust the layout of the figure depending on the number of top level comments
+    # specified. by default, the figure will add columns before it adds rows
+    num_cols = int(np.ceil(np.sqrt(num_tlc)))
+    num_rows = int(np.ceil(num_tlc / num_cols))
+
+    for tlc_idx in range(num_tlc):
+        comment_scores_summed = df_grouped.loc[tlc_idx]["comment_score"]
+        ax_handle = plt.subplot(num_rows, num_cols, tlc_idx + 1)
+        create_score_per_depth_plot(comment_scores_summed, ax_handle)
+
+    plt.tight_layout()
+    return fig_handle
+
+
+def create_score_per_depth_plot(comment_scores_summed: pd.DataFrame, ax_handle) -> None:
+    """
+    Create a series of bar charts that tally the judgement scores at each comment depth
+    """
     pivoted_df = (
         comment_scores_summed.reset_index()
         .groupby(["comment_depth", "judgement"])["comment_score"]
@@ -135,11 +154,7 @@ def create_score_per_depth_figure(
     pivoted_df[list(missing_cols)] = np.NaN
     pivoted_df = pivoted_df[bar_colors.keys()]
 
-    fig_handle = plt.figure()
-    ax_handle = plt.subplot()
     pivoted_df.plot.barh(color=bar_colors.values(), ax=ax_handle)
     plt.gca().invert_yaxis()
     plt.ylabel("Comment depth")
-    plt.legend(title="")
-
-    return fig_handle
+    plt.gca().get_legend().remove()
