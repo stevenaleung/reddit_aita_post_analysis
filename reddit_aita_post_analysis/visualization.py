@@ -37,23 +37,29 @@ def create_top_level_score_vs_time_figure(
     return fig_handle
 
 
-def create_tlc_ranking_figure(summary, num_comments):
-    scores = summary["scores"][1:num_comments]
-    nta = summary["nta"][1:num_comments]
-    yta = summary["yta"][1:num_comments]
-    info = summary["info"][1:num_comments]
-    other = summary["other"][1:num_comments]
+def create_top_level_score_vs_ranking_figure(
+    post_df: pd.DataFrame, num_comments: int
+) -> mpl.figure.Figure:
+    is_top_level_comment = post_df["comment_depth"] == 0
+    subset_df = post_df.loc[is_top_level_comment][:num_comments]
 
-    nta_idxs = np.where(nta)[0]
-    yta_idxs = np.where(yta)[0]
-    info_idxs = np.where(info)[0]
-    other_idxs = np.where(other)[0]
+    color_dict = {
+        "NTA": "tab:green",
+        "YTA": "tab:orange",
+        "UNCLEAR": "tab:blue",
+        "INFO": "tab:purple",
+    }
 
     fig_handle = plt.figure()
-    plt.scatter(nta_idxs + 1, scores[nta_idxs], c="tab:green", label="NTA")
-    plt.scatter(yta_idxs + 1, scores[yta_idxs], c="tab:orange", label="YTA")
-    plt.scatter(info_idxs + 1, scores[info_idxs], c="tab:purple", label="INFO")
-    plt.scatter(other_idxs + 1, scores[other_idxs], c="tab:blue", label="Other")
+    for judgement, color in color_dict.items():
+        ax_df = subset_df[subset_df["judgement"] == judgement]
+        plt.scatter(
+            ax_df["tlc_idx"] + 1,
+            ax_df["comment_score"],
+            c=color,
+            label=judgement,
+        )
+
     plt.xlim((0, num_comments))
     plt.grid("on")
     plt.xlabel("Comments ranked by 'best'")
