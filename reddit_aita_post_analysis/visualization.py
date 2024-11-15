@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import plotly.subplots as sp
 
 
 def create_top_level_score_vs_time_figure(
@@ -169,11 +170,42 @@ def create_sunburst_figure(comments_df: pd.DataFrame) -> go.Figure:
         ["tlc_idx", "hierarchy_id", "parent_id", "judgement", "comment_score"]
     ]
     tlc_idxs = pd.unique(subset_df["tlc_idx"])
-    tlc_df = subset_df[subset_df["tlc_idx"] == tlc_idxs[0]]
-    # sunburst plotting silently fails when there are negative numbers, so replace them
-    # with 0s
-    tlc_df.loc[tlc_df["comment_score"] < 0, "comment_score"] = 0
+    num_tlc = len(tlc_idxs)
 
+    # adjust the layout of the figure depending on the number of top level comments
+    # specified. by default, the figure will add columns before it adds rows
+    num_cols = int(np.ceil(np.sqrt(num_tlc)))
+    num_rows = int(np.ceil(num_tlc / num_cols))
+    subplot_idxs = [
+        (row_idx, col_idx) for row_idx in range(num_rows) for col_idx in range(num_cols)
+    ]
+
+    fig = sp.make_subplots(
+        rows=num_rows,
+        cols=num_cols,
+        specs=(
+            np.reshape(
+                [{"type": "sunburst"}] * num_rows * num_cols, (num_rows, num_cols)
+            )
+        ).tolist(),
+        horizontal_spacing=1e-5,
+        vertical_spacing=1e-5,
+    )
+
+    for idx, tlc_idx in enumerate(tlc_idxs):
+        tlc_df = subset_df[subset_df["tlc_idx"] == tlc_idx]
+        # sunburst plotting silently fails when there are negative numbers, so replace them
+        # with 0s
+        tlc_df.loc[tlc_df["comment_score"] < 0, "comment_score"] = 0
+        tlc_fig = create_sunburst_plot(tlc_df)
+        (row_idx, col_idx) = subplot_idxs[idx]
+        fig.append_trace(tlc_fig["data"][0], row=row_idx + 1, col=col_idx + 1)
+
+    fig.update_layout(margin=dict(l=0, r=0, t=0, b=0))
+    return fig
+
+
+def create_sunburst_plot(comment_df: pd.DataFrame) -> go.Figure:
     color_dict = {
         "NTA": "#2ca02c",  # tab:green
         "YTA": "#ff7f0e",  # tab:orange
@@ -182,7 +214,7 @@ def create_sunburst_figure(comments_df: pd.DataFrame) -> go.Figure:
     }
 
     fig = px.sunburst(
-        tlc_df,
+        comment_df,
         names="hierarchy_id",
         parents="parent_id",
         values="comment_score",
