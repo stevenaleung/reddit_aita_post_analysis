@@ -1,3 +1,4 @@
+import pandas as pd
 import praw
 import numpy as np
 import csv
@@ -9,6 +10,77 @@ def get_reddit_connection():
 
 def get_post(reddit, post_id):
     return reddit.submission(id=post_id)
+
+
+def to_dataframe(post: praw.models.Submission) -> pd.DataFrame:
+    comment_data = []
+    for tlc_idx, top_level_comment in enumerate(post.comments):
+        comment_depth = 0
+        parent_id = None
+        comment_stack = [(comment_depth, parent_id, str(tlc_idx), top_level_comment)]
+
+        while comment_stack:
+            comment_depth, parent_id, comment_idx, comment = comment_stack.pop()
+            hierarchy_id = get_hierarchy_id(parent_id, comment_idx)
+            judgement = get_judgement(comment)
+            row = [
+                tlc_idx,
+                hierarchy_id,
+                comment_depth,
+                judgement,
+                comment.id,
+                comment.score,
+                get_author_name(comment),
+                comment.body,
+            ]
+            comment_data.append(row)
+
+            for child_idx, child_comment in reversed(list(enumerate(comment.replies))):
+                comment_stack.append(
+                    (comment_depth + 1, hierarchy_id, str(child_idx), child_comment)
+                )
+
+    # it's much more efficient to first append data to a list then create a dataframe
+    # from the list of lists than it is to append data to an existing dataframe
+    return pd.DataFrame(
+        comment_data,
+        columns=[
+            "tlc_idx",
+            "hierarchy_id",
+            "comment_depth",
+            "judgement",
+            "comment_id",
+            "comment_score",
+            "author_name",
+            "comment_body",
+        ],
+    )
+
+
+def get_hierarchy_id(parent_id: str, comment_idx: str) -> str:
+    # parent_id is none for top level comments
+    if parent_id == None:
+        hierarchy_id = comment_idx
+    else:
+        hierarchy_id = ".".join([parent_id, comment_idx])
+    return hierarchy_id
+
+
+def get_judgement(comment: praw.models.reddit.comment.Comment) -> str:
+    is_nta = comment.body.find("NTA") >= 0
+    is_yta = comment.body.find("YTA") >= 0
+    is_info = comment.body.find("INFO") >= 0
+    # if no judgement or more than one judgement found, then classify as unclear
+    is_unclear = sum([is_nta, is_yta, is_info]) in {0, 2, 3}
+
+    if is_unclear:
+        return "UNCLEAR"
+    elif is_nta:
+        return "NTA"
+    elif is_yta:
+        return "YTA"
+    elif is_info:
+        return "INFO"
 
 
 def analyze_post_tlc(post):
