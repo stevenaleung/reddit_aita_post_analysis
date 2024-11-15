@@ -39,3 +39,10 @@ num_comments = 9
 fig = vis.create_total_score_figure(post_df, num_comments)
 plt.show()
 ```
+
+Create bar charts to show judgement scores per comment depth
+```python
+num_comments = 9
+fig = vis.create_score_per_depth_figure(post_df, num_comments)
+plt.show()
+```
