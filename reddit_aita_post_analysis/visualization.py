@@ -2,6 +2,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 
 
 def create_top_level_score_vs_time_figure(
@@ -157,3 +159,35 @@ def create_score_per_depth_plot(comment_scores_summed: pd.DataFrame, ax_handle) 
     plt.gca().invert_yaxis()
     plt.ylabel("Comment depth")
     plt.gca().get_legend().remove()
+
+
+def create_sunburst_figure(comments_df: pd.DataFrame) -> go.Figure:
+    """
+    Create a number of sunburst figures showing the judgement at each comment depth
+    """
+    subset_df = comments_df[
+        ["tlc_idx", "hierarchy_id", "parent_id", "judgement", "comment_score"]
+    ]
+    tlc_idxs = pd.unique(subset_df["tlc_idx"])
+    tlc_df = subset_df[subset_df["tlc_idx"] == tlc_idxs[0]]
+    # sunburst plotting silently fails when there are negative numbers, so replace them
+    # with 0s
+    tlc_df.loc[tlc_df["comment_score"] < 0, "comment_score"] = 0
+
+    color_dict = {
+        "NTA": "#2ca02c",  # tab:green
+        "YTA": "#ff7f0e",  # tab:orange
+        "UNCLEAR": "#1f77b4",  # tab:blue
+        "INFO": "#9467bd",  # tab:purple
+    }
+
+    fig = px.sunburst(
+        tlc_df,
+        names="hierarchy_id",
+        parents="parent_id",
+        values="comment_score",
+        color="judgement",
+        color_discrete_map=color_dict,
+    )
+
+    return fig
