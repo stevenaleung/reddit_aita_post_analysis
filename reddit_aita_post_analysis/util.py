@@ -77,20 +77,24 @@ def get_hierarchy_id(parent_id: str, comment_idx: str) -> str:
 
 
 def get_judgement(comment: praw.models.reddit.comment.Comment) -> str:
-    is_nta = comment.body.find("NTA") >= 0
-    is_yta = comment.body.find("YTA") >= 0
-    is_info = comment.body.find("INFO") >= 0
-    # if no judgement or more than one judgement found, then classify as unclear
-    is_unclear = sum([is_nta, is_yta, is_info]) in {0, 2, 3}
+    """
+    Determine the judgement of the comment with a naive approach. The judgement is
+    determined by whether certain keywords are in the body of the comment
+    """
+    judgement_types = ["YTA", "NTA", "ESH", "NAH", "INFO"]
+    is_judgement_present = {
+        judgement: True
+        for judgement in judgement_types
+        if comment.body.count(judgement) >= 1
+    }
+    num_judgements = sum(is_judgement_present.values())
 
-    if is_unclear:
+    if num_judgements != 1:
+        # if no judgement or more than one judgement is found, the judgement is unclear
         return "UNCLEAR"
-    elif is_nta:
-        return "NTA"
-    elif is_yta:
-        return "YTA"
-    elif is_info:
-        return "INFO"
+    else:
+        # the judgement is the only entry with a non-zero value
+        return max(is_judgement_present, key=is_judgement_present.get)
 
 
 def analyze_post_tlc(post):
