@@ -16,7 +16,7 @@ def to_dataframe(post: praw.models.Submission) -> pd.DataFrame:
     comment_data = []
     for tlc_idx, top_level_comment in enumerate(post.comments):
         comment_depth = 0
-        parent_id = None
+        parent_id = ""
         comment_stack = [(comment_depth, parent_id, str(tlc_idx), top_level_comment)]
 
         while comment_stack:
@@ -29,6 +29,7 @@ def to_dataframe(post: praw.models.Submission) -> pd.DataFrame:
             row = [
                 tlc_idx,
                 hierarchy_id,
+                parent_id,
                 comment_depth,
                 judgement,
                 comment.id,
@@ -51,6 +52,7 @@ def to_dataframe(post: praw.models.Submission) -> pd.DataFrame:
         columns=[
             "tlc_idx",
             "hierarchy_id",
+            "parent_id",
             "comment_depth",
             "judgement",
             "comment_id",
@@ -64,7 +66,7 @@ def to_dataframe(post: praw.models.Submission) -> pd.DataFrame:
 
 def get_hierarchy_id(parent_id: str, comment_idx: str) -> str:
     # parent_id is none for top level comments
-    if parent_id == None:
+    if parent_id == "":
         hierarchy_id = comment_idx
     else:
         hierarchy_id = ".".join([parent_id, comment_idx])

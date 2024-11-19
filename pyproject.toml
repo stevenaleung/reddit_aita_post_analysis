@@ -8,11 +8,18 @@ packages = [{include = "reddit_aita_post_analysis"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-ipython = "8.14"
 matplotlib = "^3.8.4"
 numpy = "^1.26.4"
 pandas = "^2.2.2"
+plotly = "^5.24.1"
 praw = "^7.7.1"
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+ipdb = "^0.13.13"
+ipython = "8.14"
 pytest = "^8.1.1"
 
 [tool.poetry.group.ci]
