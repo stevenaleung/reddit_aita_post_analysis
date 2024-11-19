@@ -13,7 +13,7 @@ import reddit_aita_post_analysis.util as util
 import reddit_aita_post_analysis.visualization as vis
 import matplotlib.pyplot as plt
 
-post_id = "123456"
+post_id = "cd7vyz"
 
 reddit = util.get_reddit_connection()
 post = util.get_post(reddit, post_id)
