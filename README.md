@@ -28,31 +28,39 @@ top_scoring_idxs = sorted_df.index[:num_comments]
 comments_df = post_df.loc[post_df["tlc_idx"].isin(top_scoring_idxs)]
 ```
 
-Create scatter plots to show top level judgements 
+### Create scatter plots to show top level judgements 
 ```python
 num_hours_cutoff = 12
 fig = vis.create_top_level_score_vs_time_figure(post_df, num_hours_cutoff)
-plt.show()
+fig.show()
+```
+<img width="75%" src="docs/images/cd7vyz_top_level_score_vs_time.png">
 
+```python
 num_comments = 20
 fig = vis.create_top_level_score_vs_ranking_figure(post_df, num_comments)
-plt.show()
+fig.show()
 ```
+<img width="75%" src="docs/images/cd7vyz_top_level_score_vs_ranking.png">
 
-Create bar charts to show total judgement scores
+### Create bar charts to show total judgement scores
 ```python
 fig = vis.create_total_score_figure(comments_df)
-plt.show()
+fig.show()
 ```
+<img width="75%" src="docs/images/cd7vyz_total_score.png">
 
-Create bar charts to show judgement scores per comment depth
+### Create bar charts to show judgement scores per comment depth
 ```python
 fig = vis.create_score_per_depth_figure(comments_df)
-plt.show()
+fig.show()
 ```
+<img width="75%" src="docs/images/cd7vyz_total_score_per_depth.png">
 
-Create sunburst charts to show judgement scores per comment depth
+
+### Create sunburst charts to show judgement scores per comment depth
 ```python
 fig = vis.create_sunburst_figure(comments_df)
 fig.show()
 ```
+<img width="75%" src="docs/images/cd7vyz_sunburst.png">
