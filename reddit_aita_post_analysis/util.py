@@ -21,6 +21,9 @@ def to_dataframe(post: praw.models.Submission) -> pd.DataFrame:
 
         while comment_stack:
             comment_depth, parent_id, comment_idx, comment = comment_stack.pop()
+            if isinstance(comment, praw.models.MoreComments):
+                continue
+
             hierarchy_id = get_hierarchy_id(parent_id, comment_idx)
             judgement = get_judgement(comment)
             hours_since_post_creation = convert_seconds_to_hours(
