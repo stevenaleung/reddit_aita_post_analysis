@@ -15,10 +15,12 @@ def create_top_level_score_vs_time_figure(
     subset_df = post_df.loc[is_within_time_cutoff & is_top_level_comment]
 
     color_dict = {
-        "NTA": "tab:green",
-        "YTA": "tab:orange",
-        "UNCLEAR": "tab:blue",
-        "INFO": "tab:purple",
+        "YTA": "#d62728",  # tab:red
+        "NTA": "#2ca02c",  # tab:green
+        "ESH": "#ff7f0e",  # tab:orange
+        "NAH": "#1f77b4",  # tab:blue
+        "INFO": "#9467bd",  # tab:purple
+        "UNCLEAR": "#7f7f7f",  # tab:gray
     }
 
     fig_handle = plt.figure()
@@ -47,10 +49,12 @@ def create_top_level_score_vs_ranking_figure(
     subset_df = post_df.loc[is_top_level_comment][:num_comments]
 
     color_dict = {
-        "NTA": "tab:green",
-        "YTA": "tab:orange",
-        "UNCLEAR": "tab:blue",
-        "INFO": "tab:purple",
+        "YTA": "#d62728",  # tab:red
+        "NTA": "#2ca02c",  # tab:green
+        "ESH": "#ff7f0e",  # tab:orange
+        "NAH": "#1f77b4",  # tab:blue
+        "INFO": "#9467bd",  # tab:purple
+        "UNCLEAR": "#7f7f7f",  # tab:gray
     }
 
     fig_handle = plt.figure()
@@ -104,7 +108,15 @@ def create_total_score_plot(comment_scores_summed: pd.Series) -> None:
     for judgement in comment_scores_summed.index:
         judgement_scores[judgement] = comment_scores_summed.loc[judgement]
 
-    bar_colors = ["tab:green", "tab:orange", "tab:blue", "tab:purple"]
+    color_dict = {
+        "YTA": "#d62728",  # tab:red
+        "NTA": "#2ca02c",  # tab:green
+        "ESH": "#ff7f0e",  # tab:orange
+        "NAH": "#1f77b4",  # tab:blue
+        "INFO": "#9467bd",  # tab:purple
+        "UNCLEAR": "#7f7f7f",  # tab:gray
+    }
+    bar_colors = [color_dict[judgement] for judgement in judgement_scores.keys()]
 
     plt.bar(judgement_scores.keys(), judgement_scores.values(), color=bar_colors)
     plt.ylabel("Voting score")
@@ -145,18 +157,20 @@ def create_score_per_depth_plot(comment_scores_summed: pd.DataFrame, ax_handle) 
         .unstack()
     )
 
-    bar_colors = {
-        "NTA": "tab:green",
-        "YTA": "tab:orange",
-        "UNCLEAR": "tab:blue",
-        "INFO": "tab:purple",
+    color_dict = {
+        "YTA": "#d62728",  # tab:red
+        "NTA": "#2ca02c",  # tab:green
+        "ESH": "#ff7f0e",  # tab:orange
+        "NAH": "#1f77b4",  # tab:blue
+        "INFO": "#9467bd",  # tab:purple
+        "UNCLEAR": "#7f7f7f",  # tab:gray
     }
 
-    missing_cols = set(bar_colors.keys()).difference(set(pivoted_df.columns))
+    missing_cols = set(color_dict.keys()).difference(set(pivoted_df.columns))
     pivoted_df[list(missing_cols)] = np.NaN
-    pivoted_df = pivoted_df[bar_colors.keys()]
+    pivoted_df = pivoted_df[color_dict.keys()]
 
-    pivoted_df.plot.barh(color=bar_colors.values(), ax=ax_handle)
+    pivoted_df.plot.barh(color=color_dict.values(), ax=ax_handle)
     plt.gca().invert_yaxis()
     plt.ylabel("Comment depth")
     plt.gca().get_legend().remove()
@@ -207,10 +221,12 @@ def create_sunburst_figure(comments_df: pd.DataFrame) -> go.Figure:
 
 def create_sunburst_plot(comment_df: pd.DataFrame) -> go.Figure:
     color_dict = {
+        "YTA": "#d62728",  # tab:red
         "NTA": "#2ca02c",  # tab:green
-        "YTA": "#ff7f0e",  # tab:orange
-        "UNCLEAR": "#1f77b4",  # tab:blue
+        "ESH": "#ff7f0e",  # tab:orange
+        "NAH": "#1f77b4",  # tab:blue
         "INFO": "#9467bd",  # tab:purple
+        "UNCLEAR": "#7f7f7f",  # tab:gray
     }
 
     fig = px.sunburst(
