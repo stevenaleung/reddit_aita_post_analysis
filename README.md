@@ -43,24 +43,29 @@ fig.show()
 ```
 <img width="75%" src="docs/images/cd7vyz_top_level_score_vs_ranking.png">
 
-### Create bar charts to show total judgement scores
-```python
-fig = vis.create_total_score_figure(comments_df)
-fig.show()
-```
-<img width="75%" src="docs/images/cd7vyz_total_score.png">
-
-### Create bar charts to show judgement scores per comment depth
-```python
-fig = vis.create_score_per_depth_figure(comments_df)
-fig.show()
-```
-<img width="75%" src="docs/images/cd7vyz_total_score_per_depth.png">
-
-
 ### Create sunburst charts to show judgement scores per comment depth
 ```python
 fig = vis.create_sunburst_figure(comments_df)
 fig.show()
 ```
 <img width="75%" src="docs/images/cd7vyz_sunburst.png">
+
+### Create bar charts to show total judgement scores
+<details>
+
+```python
+fig = vis.create_total_score_figure(comments_df)
+fig.show()
+```
+<img width="75%" src="docs/images/cd7vyz_total_score.png">
+</details>
+
+### Create bar charts to show judgement scores per comment depth
+<details>
+
+```python
+fig = vis.create_score_per_depth_figure(comments_df)
+fig.show()
+```
+<img width="75%" src="docs/images/cd7vyz_total_score_per_depth.png">
+</details>
