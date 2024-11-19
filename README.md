@@ -50,3 +50,9 @@ Create bar charts to show judgement scores per comment depth
 fig = vis.create_score_per_depth_figure(comments_df)
 plt.show()
 ```
+
+Create sunburst charts to show judgement scores per comment depth
+```python
+fig = vis.create_sunburst_figure(comments_df)
+fig.show()
+```
