@@ -6,6 +6,10 @@
 
 A package to analyze posts from reddit.com/r/AmItheAsshole/
 
+## One time setup
+- Create `praw.ini` and supply your credentials
+    - Refer to `praw_template.ini` and these pages [[1](https://praw.readthedocs.io/en/stable/getting_started/configuration/prawini.html#defining-additional-sites), [2](https://praw.readthedocs.io/en/stable/getting_started/quick_start.html#prerequisites)] for more details
+
 ## Quick start
 
 ```python
